@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import exceptions.InvalidDataException;
 
 public class App {
 
@@ -19,12 +20,21 @@ public class App {
 
     public static void main(String[] args) {
 
-        String data = "Name,Department,Salary\n" +
-                "Alice Johnson,Engineering,95000.0\n" +
-                "Bob Smith,Marketing,82000.50\n" +
-                "Charlie Brown,Design,78000.0";
+        String data = """
+                Name,Department,Salary
+                Alice Johnson,Engineering,95000.0
+                Bob Smith,Marketing,-82000.50
+                Charlie Brown,Design,78000.0""";
 
         List<Employee> employees = converter(data);
+
+        List<Employee> negativeSalaryEmployees = employees.stream()
+                .filter(e -> e.getSalary() < 0)
+                .toList();
+
+        if (!negativeSalaryEmployees.isEmpty()){
+            throw new InvalidDataException("Some salaries are negative!");
+        }
 
         double average = employees.stream()
                 .mapToDouble(Employee::getSalary)
