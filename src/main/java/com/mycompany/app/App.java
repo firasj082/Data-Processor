@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import exceptions.InvalidDataException;
+import com.mycompany.app.exceptions.InvalidDataException;
 
 public class App {
 
