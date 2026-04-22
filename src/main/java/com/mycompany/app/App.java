@@ -2,9 +2,7 @@ package com.mycompany.app;
 import com.mycompany.app.models.Employee;
 import com.opencsv.bean.CsvToBeanBuilder;
 import java.io.StringReader;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import com.mycompany.app.exceptions.InvalidDataException;
 
@@ -18,6 +16,19 @@ public class App {
                 .parse();
     }
 
+    public static Optional<Employee> maxSalaryEmployee(List<Employee> employees) {
+
+        return employees.stream().max(Comparator.comparingDouble(Employee::getSalary));
+    }
+
+    public static void checkNegativeSalaryEmployees(List<Employee> employees) {
+
+        List<Employee> negs = employees.stream().filter(e -> e.getSalary() < 0).toList();
+        if(!negs.isEmpty()){
+            throw new InvalidDataException("Some Salaries Are Of Negative Values.");
+        }
+    }
+
     public static void main(String[] args) {
 
         String data = """
@@ -28,25 +39,17 @@ public class App {
 
         List<Employee> employees = converter(data);
 
-        List<Employee> negativeSalaryEmployees = employees.stream()
-                .filter(e -> e.getSalary() < 0)
-                .toList();
-
-        if (!negativeSalaryEmployees.isEmpty()){
-            throw new InvalidDataException("Some salaries are negative!");
-        }
-
         double average = employees.stream()
                 .mapToDouble(Employee::getSalary)
                 .average()
                 .orElse(0);
 
-        Employee max = employees.stream()
-                .max(Comparator.comparingDouble(Employee::getSalary))
-                .orElse(null);
+        Optional<Employee> max = maxSalaryEmployee(employees);
 
         Map<String, List<Employee>> departments = employees.stream()
                 .collect(Collectors.groupingBy(Employee::getDepartment));
+
+        max.ifPresent(e -> System.out.println(e.getName() + "   " + e.getSalary()));
 
     }
 }
